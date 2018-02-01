@@ -60,28 +60,29 @@ This project intends to implement cryptocurrency support for OCA.
 Assume crypto coins use symbol 'CC'.
 At the time when you receive the CC the market value is 1 CC = $0.5.
 
+## Scenario 1
+
 Day 1: Invoice Cust/001 to customer (expressed in CC)
 ----------------------------------------------------
 Market value of CC (day 1): 1 CC = $0.5
 * Dr. 100 CC / $50 - Accounts receivable
 * Cr. 100 CC / $50 - Revenue
 
-
 Day 2: Receive payment for half invoice Cust/001 (in CC)
 --------------------------------------------------------
 Market value of CC (day 2): 1 CC = $0.8
 
 Payment transaction:
-* Dr. 50 CC / $40 - CC To Deposit (valued at market price at the time of receiving the coins)
+* Dr. 50 CC / $40 - CC To Inventory (valued at market price at the time of receiving the coins)
 * Cr. 50 CC / $40 - Accounts Receivable
 
 Actual receipt of the coins:
-* Dr. 50 CC / $40 - CC Deposit (valued at market price at the time of receiving the coins)
-* Cr. 50 CC / $40 - CC To Deposit
+* Dr. 50 CC / $40 - CC Inventory (valued at market price at the time of receiving the coins)
+* Cr. 50 CC / $40 - CC To Inventory
 
 Inventory of CC (day 1)
 ----------------------
-day 1:
+day 2:
 * 50 CC @$0,8/CC (total valuation of coins received / number of coins received)
 
 Day 3: Receive remaining payment for invoice Cust/001 (in CC)
@@ -89,23 +90,20 @@ Day 3: Receive remaining payment for invoice Cust/001 (in CC)
 Market value of CC (day 3): 1 CC = $2
 
 Payment transaction:
-* Dr. 50 CC / $100 - CC To Deposit (valued at market price at the time of receiving the coins)
+* Dr. 50 CC / $100 - CC To Inventory (valued at market price at the time of receiving the coins)
 * Cr. 50 CC / $100 - Accounts Receivable
 
 Actual receipt of the coins:
-* Dr. 50 CC / $100 - CC Deposit (valued at market price at the time of receiving the coins)
-* Cr. 50 CC / $100 - CC To Deposit
+* Dr. 50 CC / $100 - CC Inventory (valued at market price at the time of receiving the coins)
+* Cr. 50 CC / $100 - CC To Inventory
 
 Full invoice reconciliation. Realization of the full transaction gain/loss:
 * Dr. 0 CC / $90 - Accounts Receivable
 * Cr. 0 CC / $90 - Crypto currency exchange gain
 
-Inventory of CC
----------------
-day 1:
-* 50 CC @$0,98/CC
+Inventory of CC (day 3)
+-----------------------
 day 2:
+* 50 CC @$0,98/CC
+day 3:
 * 50 CC @$2,00/CC
-
-
-

@@ -15,6 +15,8 @@
         "account",
     ],
     'data': [
+        'security/account_cryptocurrency_security.xml',
+        'security/ir.model.access.csv',
         'data/res_currency_move_sequence.xml',
         'views/res_currency_view.xml',
         'views/res_currency_move_menuitem.xml',
