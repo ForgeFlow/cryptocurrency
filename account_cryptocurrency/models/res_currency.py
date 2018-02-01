@@ -19,6 +19,3 @@ class ResCurrency(models.Model):
     inventory_account_id = fields.Many2one('account.account',
                                            string='Inventory Account',
                                            company_dependent=True)
-    inventory_journal_id = fields.Many2one('account.journal',
-                                           string='Inventory journal',
-                                           company_dependent=True)

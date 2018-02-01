@@ -56,6 +56,7 @@ class ResCurrencyMoveLine(models.Model):
     def _get_in_base_domain(self, company_id=False):
         return [
             ('company_id', '=', company_id),
+            ('direction', '=', 'inbound')
         ]
 
     @api.depends('out_move_line_ids')

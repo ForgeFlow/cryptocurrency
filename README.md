@@ -60,8 +60,6 @@ This project intends to implement cryptocurrency support for OCA.
 Assume crypto coins use symbol 'CC'.
 At the time when you receive the CC the market value is 1 CC = $0.5.
 
-## Scenario 1
-
 Day 1: Invoice Cust/001 to customer (expressed in CC)
 ----------------------------------------------------
 Market value of CC (day 1): 1 CC = $0.5
@@ -104,6 +102,67 @@ Full invoice reconciliation. Realization of the full transaction gain/loss:
 Inventory of CC (day 3)
 -----------------------
 day 2:
-* 50 CC @$0,98/CC
+* 50 CC @$0,80/CC
 day 3:
 * 50 CC @$2,00/CC
+
+Exchange Rate Profit/Loss
+-------------------------
+Profit resulting from exchange rate should be the difference
+between the money in normal currency that we get after we get paid (
+100.00 + 40.00) - what we were supposed to get paid if the exchange
+rate had stayed the same (50.00)
+
+Day 4: Invoice to supplier Supp/001 (expressed in CC)
+-----------------------------------------------------
+Market value of CC (day 4): 1 CC = $4
+* Cr. 60 CC / $240 - Accounts Payable
+* Dr. 60 CC / $240 - Expenses
+
+Day 5: Pay half invoice of Supp/001 (in CC)
+-------------------------------------------
+Market value of CC (day 5): 1 CC = $6
+Assume FIFO strategy for issuing crypto coins
+* Dr. 30 CC / $180 - Accounts Payable
+* Cr. 30 CC / $180 - CC To Inventory
+
+* Cr. 30 CC / $24 - CC Inventory (30 CC @$0,80/CC)
+* Dr. 30 CC / $24 - CC To Inventory
+
+
+Inventory of CC (day 5)
+-----------------------
+day 1:
+* 20 CC @$0,80/CC
+day 2:
+* 50 CC @$2,00/CC
+
+Exchange Rate Profit/Loss
+-------------------------
+Profit resulting from exchange rate should be the difference
+between the cost of the coins at original purchase price ($0,80/CC) and the
+valuation at the time of paying them ($5,00/CC). That is, a profit of $126,00.
+
+Day 6: Pay the other half invoice of Supp/001 (in CC)
+----------------------------------------------------
+Market value of CC (day 6): 1 CC = $5
+Assume FIFO strategy for issuing crypto coins
+* Dr. 30 CC / $150 - Accounts Payable
+* Cr. 30 CC / $150 - CC To Inventory
+
+* Cr. 30 CC / $36 - CC Inventory (20 CC @$0,80/CC + 10 CC @$2,00/CC)
+* Dr. 30 CC / $36 - CC To Inventory
+
+Inventory of CC (day 6)
+-----------------------
+day 1:
+* 0 CC @$0,80/CC
+day 2:
+* 40 CC @$2,00/CC
+
+Exchange Rate Profit/Loss
+-------------------------
+Profit resulting from exchange rate should be the difference
+between the cost of the 20 CC @$0,80/CC and 10 @$2,00/CC, and the
+valuation at the time of paying them ($5,00/CC).
+That is, a profit of $114,00, added to the prior 126.
