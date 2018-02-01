@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-#  Copyright 2017 Eficent Business and IT Consulting Services, S.L.
+# Copyright 2018 Eficent Business and IT Consulting Services, S.L.
 # License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 import time
 import odoo.tests.common as common
@@ -54,7 +53,7 @@ class TestAccountCryptocurrency(common.TransactionCase):
                 'company_id': self.company.id,
                 'user_type_id': self.env.ref(
                     'account.data_account_type_revenue').id
-        })
+            })
         self.company.expense_currency_exchange_account_id = self.env[
             'account.account'].create({
                 'name': 'Exchange Loss',
@@ -62,7 +61,7 @@ class TestAccountCryptocurrency(common.TransactionCase):
                 'company_id': self.company.id,
                 'user_type_id': self.env.ref(
                     'account.data_account_type_expenses').id
-        })
+            })
         self.currency_cc = self.env['res.currency'].with_context(
             company_id=self.company.id,
             force_company=self.company.id).create({
@@ -73,7 +72,7 @@ class TestAccountCryptocurrency(common.TransactionCase):
                 'inventoried': True,
                 'valuation_method': 'fifo',
                 'inventory_account_id': self.inventory_account.id,
-        })
+            })
         self.customer = self.env['res.partner'].create({
             'name': 'Test customer',
             'customer': True,

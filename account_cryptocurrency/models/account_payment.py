@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 # Copyright 2018 Eficent Business and IT Consulting Services, S.L.
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from odoo import api, fields, models
+from odoo import fields, models
 
 
 class AccountPayment(models.Model):
@@ -31,4 +30,3 @@ class AccountPayment(models.Model):
                 curr_inv_move_data)
             curr_inv_move.post()
         return res
-
