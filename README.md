@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Eficent/cryptocurrency.svg?branch=11.0)](https://travis-ci.org/Eficent/cryptocurrency)
+[![codecov](https://codecov.io/gh/Eficent/cryptocurrency/branch/11.0/graph/badge.svg)](https://codecov.io/gh/Eficent/cryptocurrency)
 
 Cryptocurrency
 ==============
