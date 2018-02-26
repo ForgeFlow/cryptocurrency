@@ -5,7 +5,6 @@ from odoo import api, exceptions, fields, models, _
 
 _VALUATION_METHODS = [
     ('fifo', 'First-in-First Out'),
-    ('average', 'Average'),
 ]
 
 
@@ -14,10 +13,12 @@ class ResCurrency(models.Model):
 
     inventoried = fields.Boolean('Inventoried')
     valuation_method = fields.Selection(selection=_VALUATION_METHODS,
-                                        string='Valuation Method')
+                                        string='Valuation Method',
+                                        )
     inventory_account_id = fields.Many2one('account.account',
                                            string='Inventory Account',
-                                           company_dependent=True)
+                                           company_dependent=True,
+                                           )
 
     @api.constrains('inventory_account_id')
     def _check_inventory_account_id(self):
@@ -28,3 +29,10 @@ class ResCurrency(models.Model):
                     _('The currency of the Inventory Account should be %s') %
                     rec.name)
 
+    @api.constrains('inventoried', 'valuation_method')
+    def _check_inventory_account_id(self):
+        for rec in self:
+            if rec.inventoried and not rec.ivaluation_method:
+                raise exceptions.Warning(
+                    _('You must indicate a valuation method for currency %s')
+                    % rec.name)

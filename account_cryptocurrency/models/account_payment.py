@@ -1,7 +1,7 @@
 # Copyright 2018 Eficent Business and IT Consulting Services, S.L.
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from odoo import api, fields, models, _
+from odoo import api, exceptions, fields, models, _
 
 
 class AccountPayment(models.Model):
@@ -55,3 +55,19 @@ class AccountPayment(models.Model):
             'domain': [('id', 'in', [
                 x.id for x in self.res_currency_move_ids])],
         }
+
+    @api.onchange('currency_id')
+    def _onchange_currency(self):
+        if self.currency_id:
+            if self.currency_id.inventoried:
+                return {'domain': {'journal_id': [('currency_id', '=',
+                                                   self.currency_id.id)]}}
+        return {}
+
+    @api.constrains('payment_type')
+    def _check_payment_type_crypto(self):
+        for rec in self:
+            if rec.currency_id.inventoried and rec.payment_type == 'transfer':
+                raise exceptions.Warning(
+                    _('You cannot make internal transfers using crypto '
+                      'currencies.'))

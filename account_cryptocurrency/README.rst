@@ -7,6 +7,30 @@ Account Crypto Currency
 
 This module provides basic support for the management of cryptocurrencies.
 
+* Cryptocurrencies sare commonly considered property from a
+  taxation standpoint.
+
+* This means that every time that you receive or send cryptocurrencies, you
+  are entering into a taxable transaction, and will need to report on the
+  gain/loss resulting from the receipt/issue of the cryptocurrency.
+
+* When you receive cryptocurrencies (in exchange for goods delivered,
+  service rendered or because you mined it), that translates into taxable
+  income to the recipient. The valuation should be based on the market value of
+  the cryptocurrency at the time of receipt, and it can be provided by a
+  third party (e.g. the exchange platform) or needs to be identified by
+  you somehow.
+
+* You have to retain the cost of the crytptocurrency for as long as you keep
+  it.
+
+* When you pay out cryptocurrencies (in exchange for goods or services
+  purchased, or if you exchanged fpr another crypto or normal currency) this
+  constitutes again a taxable transaction. In that case the gain/loss is
+  computed as the difference between the cost of the cryptocurrency that
+  you pay with, and the value of what you receive back, valued in your
+  operating normal currency.
+
 
 Installation
 ============
@@ -46,10 +70,28 @@ Additional remarks:
 
 
 
-Known issues / Roadmap
-======================
+Usage
+=====
+
+* If you have negotiated your invoices with customers / suppliers using
+  crypto currencies, you can indicate them in the corresponding invoice.
+
+* When you receive/send payments you can indicate the crypto currency that
+  you want to use for the payment. Once the payment has been posted you will
+  be able to navigate to the associated currency moves.
+
+* You cannot make internal transfers using cryptocurrencies.
 
 
+
+
+Bug Tracker
+===========
+
+Bugs are tracked on `GitHub Issues
+<https://github.com/OCA/cryptocurrency/issues>`_. In case of trouble, please
+check there if your issue has already been reported. If you spotted it first,
+help us smash it by providing detailed and welcomed feedback.
 
 Credits
 =======

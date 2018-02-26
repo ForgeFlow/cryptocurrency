@@ -137,6 +137,7 @@ class ResCurrencyMove(models.Model):
                 self.env['res.currency.move.line'].create(
                     move_line_data)
             elif rec.direction == 'outbound':
+                # Currency we only support fifo valuation method.
                 self._run_fifo()
             rec.state = 'posted'
 
