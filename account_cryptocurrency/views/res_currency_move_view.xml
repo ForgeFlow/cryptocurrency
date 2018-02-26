@@ -22,14 +22,14 @@
             <field name="name">res.currency.move.tree</field>
             <field name="model">res.currency.move</field>
             <field name="arch" type="xml">
-                <tree string="Currency Moves">
+                <tree string="Currency Moves" create="false">
                     <field name="name"/>
                     <field name="date"/>
                     <field name="payment_id"/>
                     <field name="direction"/>
                     <field name="currency_id"/>
                     <field name="company_id" groups="base.group_multi_company"/>
-                    <field name="amount"/>
+                    <field name="amount" widget="monetary"/>
                     <field name="direction"/>
                     <field name="state"/>
                 </tree>
@@ -41,6 +41,9 @@
             <field name="model">res.currency.move</field>
             <field name="arch" type="xml">
                 <form string="Currency Move">
+                    <header>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,posted,cancelled"/>
+                    </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
                         </div>
@@ -51,7 +54,7 @@
                                 <field name="currency_id"/>
                                 <field name="date"/>
                                 <field name="direction"/>
-                                <field name="amount"/>
+                                <field name="amount" widget="monetary"/>
                                 <field name="company_id" groups="base.group_multi_company"/>
                             </group>
                             <group>

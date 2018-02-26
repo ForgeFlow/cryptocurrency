@@ -2,11 +2,12 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 from odoo import fields, models, _
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
 
 _STATES = [
     ('draft', 'Draft'),
     ('posted', 'Posted'),
+    ('cancelled', 'Cancelled'),
 ]
 
 _DIRECTIONS = [
@@ -19,27 +20,56 @@ class ResCurrencyMove(models.Model):
     _name = "res.currency.move"
     _description = 'Currency Move'
 
-    name = fields.Char(index=True, required=True)
+    name = fields.Char(index=True, required=True,
+                       readonly=True,
+                       states={'draft': [('readonly', False)]},
+                       copy=False,
+                       )
     payment_id = fields.Many2one('account.payment',
-                                 string='Payment')
-    amount = fields.Float('Amount')
+                                 string='Payment',
+                                 readonly=True,
+                                 states={'draft': [('readonly', False)]},
+                                 copy=False,
+                                 )
+    amount = fields.Float('Amount', readonly=True,
+                          states={'draft': [('readonly', False)]},
+                          )
     currency_id = fields.Many2one('res.currency', string='Currency',
-                                  ondelete='restrict', required=True)
+                                  readonly=True, ondelete='restrict',
+                                  required=True,
+                                  states={'draft': [('readonly', False)]},
+                                  )
     date = fields.Date(string='Payment Date',
-                       default=fields.Date.context_today, required=True,
-                       copy=False)
+                       readonly=True, default=fields.Date.context_today,
+                       required=True, copy=False,
+                       states={'draft': [('readonly', False)]},
+                       )
     journal_id = fields.Many2one('account.journal',
                                  string='Account Journal',
-                                 required=True)
+                                 readonly=True,
+                                 required=True,
+                                 states={'draft': [('readonly', False)]},
+                                 )
     state = fields.Selection(selection=_STATES, required=True,
-                             default='draft')
+                             readonly=True, default='draft',
+                             states={'draft': [('readonly', False)]},
+                             )
 
     company_id = fields.Many2one('res.company', string='Company',
-                                 required=True)
+                                 required=True, readonly=True,
+                                 states={'draft': [('readonly', False)]},
+                                 )
     direction = fields.Selection(selection=_DIRECTIONS,
-                                 string='Direction', required=True)
+                                 string='Direction', required=True,
+                                 readonly=True,
+                                 states={'draft': [('readonly', False)]},
+                                 )
     move_line_ids = fields.One2many('res.currency.move.line', 'move_id',
-                                    string='Currency move lines')
+                                    string='Currency move lines',
+                                    copy=False,
+                                    readonly=True,
+                                    states={'draft': [('readonly', False)]},
+                                    )
 
     def create(self, vals):
         if not vals.get('name'):
@@ -109,3 +139,20 @@ class ResCurrencyMove(models.Model):
             elif rec.direction == 'outbound':
                 self._run_fifo()
             rec.state = 'posted'
+
+    def action_draft(self):
+        return self.write({'state': 'draft'})
+
+    def cancel(self):
+        for rec in self:
+            for move in rec.move_line_ids.mapped('account_move_ids'):
+                move.button_cancel()
+                move.unlink()
+            rec.move_line_ids.unlink()
+            rec.state = 'cancelled'
+
+    def unlink(self):
+        if any(bool(rec.move_line_ids) for rec in self):
+            raise UserError(_("You can not delete a currency move "
+                              "that is already posted"))
+        return super(ResCurrencyMove, self).unlink()

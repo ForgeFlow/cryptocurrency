@@ -20,15 +20,17 @@
             <field name="name">res.currency.move.line.tree</field>
             <field name="model">res.currency.move.line</field>
             <field name="arch" type="xml">
-                <tree string="Currency Move Lines">
+                <tree string="Currency Move Lines" create="false">
                     <field name="move_id"/>
                     <field name="date"/>
                     <field name="currency_id"/>
                     <field name="direction"/>
                     <field name="company_id" groups="base.group_multi_company"/>
-                    <field name="quantity"/>
-                    <field name="remaining_qty"/>
-                    <field name="price_unit"/>
+                    <field name="quantity" widget="monetary"/>
+                    <field name="remaining_qty" widget="monetary"/>
+                    <field name="company_currency" invisible="1"/>
+                    <field name="price_unit" widget="monetary" options="{'currency_field': 'company_currency'}"/>
+                    <field name="amount" widget="monetary" options="{'currency_field': 'company_currency'}"/>
                 </tree>
             </field>
         </record>
@@ -47,9 +49,11 @@
                                 <field name="currency_id"/>
                                 <field name="date"/>
                                 <field name="direction"/>
-                                <field name="quantity"/>
-                                <field name="remaining_qty"/>
-                                <field name="price_unit"/>
+                                <field name="quantity" widget="monetary"/>
+                                <field name="remaining_qty" widget="monetary"/>
+                                <field name="company_currency" invisible="1"/>
+                                <field name="price_unit" widget="monetary"/>
+                                <field name="amount" widget="monetary" options="{'currency_field': 'company_currency'}"/>
                                 <field name="in_move_line_id"/>
                                 <field name="company_id" groups="base.group_multi_company"/>
                             </group>
@@ -60,6 +64,11 @@
                                 <group>
                                     <field name="out_move_line_ids"
                                            nolabel="1"/>
+                                </group>
+                            </page>
+                            <page name="account_moves" string="Journal Entries">
+                                <group>
+                                    <field name="account_move_ids" nolabel="1"/>
                                 </group>
                             </page>
                         </notebook>

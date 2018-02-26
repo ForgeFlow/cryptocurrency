@@ -21,5 +21,6 @@
         'views/res_currency_move_menuitem.xml',
         'views/res_currency_move_view.xml',
         'views/res_currency_move_line_view.xml',
+        'views/account_payment_view.xml',
     ],
 }

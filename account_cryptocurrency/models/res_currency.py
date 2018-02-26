@@ -1,7 +1,7 @@
 # Copyright 2018 Eficent Business and IT Consulting Services, S.L.
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from odoo import fields, models
+from odoo import api, exceptions, fields, models, _
 
 _VALUATION_METHODS = [
     ('fifo', 'First-in-First Out'),
@@ -18,3 +18,13 @@ class ResCurrency(models.Model):
     inventory_account_id = fields.Many2one('account.account',
                                            string='Inventory Account',
                                            company_dependent=True)
+
+    @api.constrains('inventory_account_id')
+    def _check_inventory_account_id(self):
+        for rec in self:
+            if rec.inventory_account_id and \
+                    rec.inventory_account_id.currency_id != rec.id:
+                raise exceptions.Warning(
+                    _('The currency of the Inventory Account should be %s') %
+                    rec.name)
+

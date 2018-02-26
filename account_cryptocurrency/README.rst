@@ -5,11 +5,45 @@
 Account Crypto Currency
 =======================
 
+This module provides basic support for the management of cryptocurrencies.
 
 
-.. image:: https://odoo-community.org/website/image/ir.attachment/5784_f2813bd/datas
-   :alt: Try me on Runbot
-   :target: https://runbot.odoo-community.org/runbot/repo/github-com-oca-pos-184
+Installation
+============
+
+* Install the module 'account_invoicing' to be able to display the menus.
+
+Configuration
+=============
+
+* For the user that will do the configuration, make sure to activate the
+  option 'Show Full Accounting Features' in the user profile.
+
+* Activate the Multi-Currency in 'Invoicing / Configuration /
+  Settings / Multi-Currencies.
+
+* Create the crypto currency in 'Invoicing / Configuration / Accounting /
+  Currencies'. Complete the following fields:  'Inventoried', 'Valuation
+  Method'.
+
+* Add to the crypto currency an 'Inventory Account'. This Account must
+  indicate in field 'Account Currency' the same currency.
+
+* Create an Account Journal associated to the payments of the crypto
+  currency, in 'Invoicing / Configuration / Accounting / Journals'. Indicate
+  in the 'Currency' field the crypto currency. In the 'Default Credit Account'
+  and 'Default Debit Account' you should indicate a new Account of type
+  'Expenses', with a name similar to 'Crypto currency X Gain/Loss'. The new
+  Account must also refer to the crypto currency account.
+
+
+Additional remarks:
+
+ * In case that your company currency is not EUR, make sure that the main
+   company currency has no exchange rates. Go to 'Invoicing / Configuration /
+   Accounting / Currencies' and for the company currency press the
+   button 'Rates' and delete any rate listed.
+
 
 
 Known issues / Roadmap

@@ -1,7 +1,7 @@
 # Copyright 2018 Eficent Business and IT Consulting Services, S.L.
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from odoo import fields, models
+from odoo import api, fields, models, _
 
 
 class AccountPayment(models.Model):
@@ -10,6 +10,14 @@ class AccountPayment(models.Model):
     res_currency_move_ids = fields.One2many(
         'res.currency.move', 'payment_id', readonly=True, copy=False,
         ondelete='cascade')
+
+    has_currency_move_ids = fields.Boolean(
+        compute="_compute_has_currency_move_ids",
+        help="Technical field used for usability purposes")
+
+    @api.depends('invoice_ids')
+    def _compute_has_currency_move_ids(self):
+        self.has_currency_move_ids = bool(self.res_currency_move_ids)
 
     def _prepare_currency_inventory_move(self, amount):
         return {
@@ -30,3 +38,20 @@ class AccountPayment(models.Model):
                 curr_inv_move_data)
             curr_inv_move.post()
         return res
+
+    def cancel(self):
+        self.res_currency_move_ids.cancel()
+        self.res_currency_move_ids.unlink()
+        return super(AccountPayment, self).cancel()
+
+    def button_currency_moves(self):
+        return {
+            'name': _('Currency moves'),
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'res.currency.move',
+            'view_id': False,
+            'type': 'ir.actions.act_window',
+            'domain': [('id', 'in', [
+                x.id for x in self.res_currency_move_ids])],
+        }

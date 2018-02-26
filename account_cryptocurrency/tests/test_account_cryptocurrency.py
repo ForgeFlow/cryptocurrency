@@ -152,7 +152,6 @@ class TestAccountCryptocurrency(common.TransactionCase):
         # at the time of receiving the coins)
         # * Cr. 50 CC / $40 - CC To Inventory
         #####
-        # Instead of changing day we just change the rate
         self.env['res.currency.rate'].create({
             'currency_id': self.currency_cc.id,
             'name': time.strftime('%Y') + '-01-02',
@@ -181,7 +180,7 @@ class TestAccountCryptocurrency(common.TransactionCase):
             lambda x: x.account_id == self.receivable_account)
         self.assertEqual(aml.amount_currency, -50.0)
         self.assertEqual(aml.credit, 40.0)
-        # Inventory of CC (day 1)
+        # Inventory of CC (day 2)
         # ----------------------
         # day 2:
         # 50 CC @$0,8/CC (total valuation of coins received /
@@ -419,3 +418,85 @@ class TestAccountCryptocurrency(common.TransactionCase):
         to_inventory_balance = self._check_account_balance(
             self.to_inventory_account)
         self.assertEqual(to_inventory_balance, -114.0 - 126)
+
+    def test_02(self):
+        """ Cancels a payment """
+        ####
+        # Day 1: Invoice Cust/001 to customer (expressed in CC)
+        # Market value of CC (day 1): 1 CC = $0.5
+        # * Dr. 100 CC / $50 - Accounts receivable
+        # * Cr. 100 CC / $50 - Revenue
+        ####
+        self.env['res.currency.rate'].create({
+            'currency_id': self.currency_cc.id,
+            'name': time.strftime('%Y') + '-01-01',
+            'rate': 2,
+        })
+        invoice_cust_001 = self.env['account.invoice'].create({
+            'partner_id': self.customer.id,
+            'account_id': self.receivable_account.id,
+            'type': 'out_invoice',
+            'currency_id': self.currency_cc.id,
+            'company_id': self.company.id,
+            'date_invoice': time.strftime('%Y') + '-01-01',
+        })
+        self.env['account.invoice.line'].create({
+            'product_id': self.env.ref('product.product_product_4').id,
+            'quantity': 1.0,
+            'price_unit': 100.0,
+            'invoice_id': invoice_cust_001.id,
+            'name': 'product that cost 100',
+            'account_id': self.account_revenue.id,
+        })
+        invoice_cust_001.action_invoice_open()
+        self.assertEqual(invoice_cust_001.residual_company_signed, 50.0)
+        aml = invoice_cust_001.move_id.mapped('line_ids').filtered(
+            lambda x: x.account_id == self.account_revenue)
+        self.assertEqual(aml.credit, 50.0)
+        #####
+        # Day 2: Receive payment for half invoice Cust/001 (in CC)
+        # -------------------------------------------------------
+        # Market value of CC (day 2): 1 CC = $0.8
+
+        # Payment transaction:
+        # * Dr. 50 CC / $40 - CC To Inventory (valued at market price
+        # at the time of receiving the coins)
+        # * Cr. 50 CC / $40 - Accounts Receivable
+
+        # Actual receipt of the coins:
+        # * Dr. 50 CC / $40 - CC Inventory (valued at market price
+        # at the time of receiving the coins)
+        # * Cr. 50 CC / $40 - CC To Inventory
+        #####
+        # Balance of the To Inventory account should be 0
+        to_inventory_balance = self._check_account_balance(
+            self.to_inventory_account)
+        self.assertEqual(to_inventory_balance, 0.0)
+        self.env['res.currency.rate'].create({
+            'currency_id': self.currency_cc.id,
+            'name': time.strftime('%Y') + '-01-02',
+            'rate': 1.25,
+        })
+        # register payment on invoice
+        payment = self.env['account.payment'].create(
+            {'payment_type': 'inbound',
+             'payment_method_id': self.env.ref(
+                 'account.account_payment_method_manual_in').id,
+             'partner_type': 'customer',
+             'partner_id': self.customer.id,
+             'amount': 50,
+             'currency_id': self.currency_cc.id,
+             'payment_date': time.strftime('%Y') + '-01-02',
+             'journal_id': self.cc_journal.id,
+             })
+        payment.post()
+        payment.journal_id.update_posted = True
+        payment.cancel()
+        # Balance of the To Inventory account should be 0
+        to_inventory_balance = self._check_account_balance(
+            self.to_inventory_account)
+        self.assertEqual(to_inventory_balance, 0.0)
+        # Balance of the Inventory account should be 0
+        inventory_balance = self._check_account_balance(
+            self.inventory_account)
+        self.assertEqual(inventory_balance, 0.0)
