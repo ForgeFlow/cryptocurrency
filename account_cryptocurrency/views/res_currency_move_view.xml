@@ -30,7 +30,6 @@
                     <field name="currency_id"/>
                     <field name="company_id" groups="base.group_multi_company"/>
                     <field name="amount" widget="monetary"/>
-                    <field name="direction"/>
                     <field name="state"/>
                 </tree>
             </field>

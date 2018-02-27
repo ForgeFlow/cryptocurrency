@@ -32,7 +32,7 @@ class ResCurrency(models.Model):
     @api.constrains('inventoried', 'valuation_method')
     def _check_inventory_account_id(self):
         for rec in self:
-            if rec.inventoried and not rec.ivaluation_method:
+            if rec.inventoried and not rec.valuation_method:
                 raise exceptions.Warning(
                     _('You must indicate a valuation method for currency %s')
                     % rec.name)
