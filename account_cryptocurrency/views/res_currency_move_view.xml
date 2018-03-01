@@ -22,7 +22,9 @@
             <field name="name">res.currency.move.tree</field>
             <field name="model">res.currency.move</field>
             <field name="arch" type="xml">
-                <tree string="Currency Moves" create="false">
+                <tree string="Currency Moves"
+                      decoration-info="state == 'draft'"
+                      decoration-muted="state == 'cancelled'" >
                     <field name="name"/>
                     <field name="date"/>
                     <field name="payment_id"/>
@@ -41,6 +43,13 @@
             <field name="arch" type="xml">
                 <form string="Currency Move">
                     <header>
+                        <button name="post" string="Post" type="object"
+                                states="draft"
+                                class="oe_highlight"/>
+                        <button name="cancel" string="Cancel" type="object"
+                                states="posted"/>
+                        <button name="action_draft" string="Draft" type="object"
+                                states="cancelled"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,posted,cancelled"/>
                     </header>
                     <sheet>
@@ -54,6 +63,9 @@
                                 <field name="date"/>
                                 <field name="direction"/>
                                 <field name="amount" widget="monetary"/>
+                                <field name="journal_id"/>
+                                <field name="debit_account_id"/>
+                                <field name="credit_account_id"/>
                                 <field name="company_id" groups="base.group_multi_company"/>
                             </group>
                             <group>

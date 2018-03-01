@@ -94,14 +94,9 @@ class ResCurrencyMoveLine(models.Model):
 
     @api.model
     def _prepare_credit_aml(self):
-        if self.direction == 'inbound':
-            account = self.move_id.journal_id.default_credit_account_id
-        else:
-            account = self.currency_id.with_context(
-                force_company=self.company_id.id).inventory_account_id
         return {
             'name': '',
-            'account_id': account.id,
+            'account_id': self.move_id.credit_account_id.id,
             'debit': 0.0,
             'credit': self.amount,
             'currency_id': self.currency_id.id,
@@ -109,15 +104,9 @@ class ResCurrencyMoveLine(models.Model):
         }
 
     def _prepare_debit_aml(self):
-        if self.direction == 'inbound':
-            account = self.currency_id.with_context(
-                force_company=self.company_id.id).inventory_account_id
-        else:
-            account = self.move_id.journal_id.default_debit_account_id
-
         return {
             'name': '',
-            'account_id': account.id,
+            'account_id': self.move_id.debit_account_id.id,
             'debit': self.amount,
             'credit': 0.0,
             'currency_id': self.currency_id.id,

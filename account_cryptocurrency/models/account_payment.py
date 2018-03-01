@@ -40,7 +40,7 @@ class AccountPayment(models.Model):
         return res
 
     def cancel(self):
-        self.res_currency_move_ids.cancel()
+        self.res_currency_move_ids.with_context(force_cancel=True).cancel()
         self.res_currency_move_ids.unlink()
         return super(AccountPayment, self).cancel()
 

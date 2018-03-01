@@ -1,7 +1,7 @@
 # Copyright 2018 Eficent Business and IT Consulting Services, S.L.
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from odoo import fields, models, _
+from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 
 _STATES = [
@@ -11,8 +11,8 @@ _STATES = [
 ]
 
 _DIRECTIONS = [
-    ('inbound', 'Receive Money'),
-    ('outbound', 'Send Money'),
+    ('inbound', 'Receive'),
+    ('outbound', 'Send'),
 ]
 
 
@@ -21,14 +21,12 @@ class ResCurrencyMove(models.Model):
     _description = 'Currency Move'
 
     name = fields.Char(index=True, required=True,
-                       readonly=True,
-                       states={'draft': [('readonly', False)]},
                        copy=False,
+                       default=lambda self: _('New'), readonly=True,
                        )
     payment_id = fields.Many2one('account.payment',
                                  string='Payment',
                                  readonly=True,
-                                 states={'draft': [('readonly', False)]},
                                  copy=False,
                                  )
     amount = fields.Float('Amount', readonly=True,
@@ -38,8 +36,9 @@ class ResCurrencyMove(models.Model):
                                   readonly=True, ondelete='restrict',
                                   required=True,
                                   states={'draft': [('readonly', False)]},
+                                  domain="[('inventoried', '=', True)]"
                                   )
-    date = fields.Date(string='Payment Date',
+    date = fields.Date(string='Move Date',
                        readonly=True, default=fields.Date.context_today,
                        required=True, copy=False,
                        states={'draft': [('readonly', False)]},
@@ -50,14 +49,23 @@ class ResCurrencyMove(models.Model):
                                  required=True,
                                  states={'draft': [('readonly', False)]},
                                  )
+    debit_account_id = fields.Many2one(
+        'account.account', readonly=True,
+        compute='_compute_accounts')
+    credit_account_id = fields.Many2one(
+        'account.account', readonly=True,
+        compute='_compute_accounts')
     state = fields.Selection(selection=_STATES, required=True,
                              readonly=True, default='draft',
                              states={'draft': [('readonly', False)]},
                              )
-
     company_id = fields.Many2one('res.company', string='Company',
                                  required=True, readonly=True,
                                  states={'draft': [('readonly', False)]},
+                                 change_default=True,
+                                 default=lambda self: self.env[
+                                     'res.company']._company_default_get(
+                                     'cryptocurrency.mine'),
                                  )
     direction = fields.Selection(selection=_DIRECTIONS,
                                  string='Direction', required=True,
@@ -71,10 +79,29 @@ class ResCurrencyMove(models.Model):
                                     states={'draft': [('readonly', False)]},
                                     )
 
+    @api.depends('currency_id', 'journal_id', 'direction')
+    def _compute_accounts(self):
+        for rec in self:
+            inventory_account = self.currency_id.with_context(
+                force_company=self.company_id.id).inventory_account_id
+
+            if self.direction == 'inbound':
+                rec.debit_account_id = inventory_account
+                rec.credit_account_id = \
+                    self.journal_id.default_credit_account_id
+            else:
+                rec.debit_account_id = \
+                    self.journal_id.default_debit_account_id
+                rec.credit_account_id = inventory_account
+
+    def _get_sequence(self):
+        return 'res.currency.move'
+
+    @api.model
     def create(self, vals):
         if not vals.get('name'):
             vals['name'] = self.env['ir.sequence'].next_by_code(
-                'res.currency.move')
+                self._get_sequence()) or _('New')
         return super(ResCurrencyMove, self).create(vals)
 
     def _prepare_incoming_move_line(self):
@@ -145,7 +172,12 @@ class ResCurrencyMove(models.Model):
         return self.write({'state': 'draft'})
 
     def cancel(self):
+        force_cancel = self.env.context.get('force_cancel', False)
         for rec in self:
+            if rec.payment_id and not force_cancel:
+                raise UserError(_("You can not cancel a currency move "
+                                  "that is linked to a payment. "
+                                  "Please cancel the payment first."))
             for move in rec.move_line_ids.mapped('account_move_ids'):
                 move.button_cancel()
                 move.unlink()
@@ -157,3 +189,10 @@ class ResCurrencyMove(models.Model):
             raise UserError(_("You can not delete a currency move "
                               "that is already posted"))
         return super(ResCurrencyMove, self).unlink()
+
+    @api.constrains('amount')
+    def _constrain_amount(self):
+        for rec in self:
+            if rec.amount <= 0.0:
+                raise ValidationError(_(
+                    'The amount must always be positive.'))
